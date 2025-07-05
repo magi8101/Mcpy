@@ -6,8 +6,6 @@
 
 A production-grade, ultra-optimized Minecraft server engine built with Python, Cython, and scientific computing libraries. This project aims to deliver exceptional performance while maintaining the flexibility and accessibility of Python.
 
-
-
 ## 🚀 Key Features
 
 - **Ultra-optimized Core**: Cython-accelerated server core achieving near-C performance
@@ -24,24 +22,28 @@ A production-grade, ultra-optimized Minecraft server engine built with Python, C
 MCPy is built on five specialized core modules, each carefully designed for maximum performance:
 
 1. **`server_core.pyx`**: Central server management
+
    - Event-driven architecture for request handling
    - Efficient worker thread pool management
    - Optimized tick system with adaptive timing
    - Performance profiling and bottleneck detection
 
 2. **`world_engine.pyx`**: Procedural world generation
+
    - Scientifically accurate noise generation algorithms
    - Multi-threaded chunk generation and loading
    - Memory-efficient terrain representation
    - Advanced biome generation systems
 
 3. **`network_core.pyx`**: High-performance networking
+
    - Zero-copy packet serialization
    - Protocol-level compression and optimization
    - Connection pooling and management
    - DDoS protection mechanisms
 
 4. **`entity_system.pyx`**: Efficient entity lifecycle management
+
    - Spatial hash-based entity tracking
    - Multi-threaded physics simulation
    - AI behavior system with path-finding
@@ -64,7 +66,9 @@ MCPy is built on five specialized core modules, each carefully designed for maxi
 ## ⚙️ Technical Implementation
 
 ### Cython Optimization Strategies
+
 MCPy uses several advanced Cython techniques to achieve C-like performance:
+
 - Static typing with `cdef` variables and functions
 - Memory management with pointer arithmetic where necessary
 - Compiler directives for bounds checking and wraparound elimination
@@ -72,7 +76,9 @@ MCPy uses several advanced Cython techniques to achieve C-like performance:
 - Efficient parallelization with thread pools
 
 ### Entity System Design
+
 The entity system features:
+
 - Hierarchical class structure for specialized entity behaviors
 - Spatial partitioning for O(1) entity lookup in areas of interest
 - Component-based design for extensibility
@@ -80,7 +86,9 @@ The entity system features:
 - Adaptive entity LOD (Level of Detail) based on distance
 
 ### World Generation Algorithm
+
 World generation implements:
+
 - Multi-octave Perlin and Simplex noise combinations
 - Biome transitions using Voronoi diagrams
 - Scientifically accurate erosion and cave formation algorithms
@@ -90,6 +98,7 @@ World generation implements:
 ## 📦 Installation
 
 ### Prerequisites
+
 - Python 3.9+ (3.11 recommended for best performance)
 - C++ compiler (Visual Studio 2019+ on Windows, GCC 9+ on Linux)
 - PostgreSQL 13+ (optional, for production environments)
@@ -112,6 +121,7 @@ chmod +x setup.sh
 ```
 
 This script handles:
+
 - Setting up a virtual environment
 - Installing all dependencies
 - Building Cython modules
@@ -172,23 +182,24 @@ python -m mcpy.server --debug --log-level debug
 
 ### Command Line Options
 
-| Option | Description |
-|--------|-------------|
-| `--config PATH` | Path to custom TOML configuration file |
-| `--world PATH` | Path to world directory |
-| `--port NUMBER` | Network port (default: 25565) |
-| `--max-players NUMBER` | Maximum number of players (default: 20) |
-| `--view-distance NUMBER` | Chunk view distance (default: 10) |
-| `--performance-mode` | Enables additional optimizations |
-| `--debug` | Enables debug mode |
-| `--log-level LEVEL` | Set logging level (default: info) |
-| `--backup` | Enable automatic backups |
+| Option                   | Description                             |
+| ------------------------ | --------------------------------------- |
+| `--config PATH`          | Path to custom TOML configuration file  |
+| `--world PATH`           | Path to world directory                 |
+| `--port NUMBER`          | Network port (default: 25565)           |
+| `--max-players NUMBER`   | Maximum number of players (default: 20) |
+| `--view-distance NUMBER` | Chunk view distance (default: 10)       |
+| `--performance-mode`     | Enables additional optimizations        |
+| `--debug`                | Enables debug mode                      |
+| `--log-level LEVEL`      | Set logging level (default: info)       |
+| `--backup`               | Enable automatic backups                |
 
 ## 🗄️ Database Configuration
 
 MCPy supports both SQLite (for development) and PostgreSQL (for production) databases. Configure these settings in your `config.toml` file:
 
 ### SQLite (Default)
+
 ```toml
 [database]
 type = "sqlite"
@@ -198,6 +209,7 @@ synchronous = "NORMAL"  # Balance between safety and performance
 ```
 
 ### PostgreSQL (Recommended for Production)
+
 ```toml
 [database]
 type = "postgresql"
@@ -215,7 +227,8 @@ echo = false  # Set to true for query debugging
 
 The persistence layer uses SQLAlchemy ORM with these key features:
 
-- **Transactional World Saving**: 
+- **Transactional World Saving**:
+
   ```python
   with session.begin():
       for chunk in dirty_chunks:
@@ -223,15 +236,17 @@ The persistence layer uses SQLAlchemy ORM with these key features:
   ```
 
 - **Efficient Chunk Serialization**:
+
   ```python
   # Chunks are serialized using NumPy's efficient binary format
-  chunk_data = np.savez_compressed(io_buffer, 
+  chunk_data = np.savez_compressed(io_buffer,
                                   blocks=chunk.blocks,
                                   heightmap=chunk.heightmap,
                                   biomes=chunk.biomes)
   ```
 
 - **Player Data Management**:
+
   ```python
   # Player data is stored as a JSON document with binary inventories
   player_model = PlayerModel(
@@ -245,7 +260,6 @@ The persistence layer uses SQLAlchemy ORM with these key features:
 
 - **Auto-saving System**:
   Implements an intelligent dirty-tracking system that only saves modified chunks and entities.
-  
 - **Backup Management**:
   Automated world backups with configurable intervals and retention policies.
 
@@ -271,6 +285,7 @@ pytest --cov=mcpy --cov-report=html
 ### Performance Tuning
 
 1. **Entity System Optimization**:
+
    ```python
    # Use spatial hashing for entity collision detection
    entity_spatial_hash = {(int(e.x/16), int(e.z/16)): [] for e in entities}
@@ -279,6 +294,7 @@ pytest --cov=mcpy --cov-report=html
    ```
 
 2. **World Engine Tuning**:
+
    ```python
    # Parallelize chunk generation
    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
@@ -356,18 +372,21 @@ class ZombieAI(MobAI):
 ## 🗺️ Development Roadmap
 
 ### Short-term Goals
+
 - [ ] Complete entity collision system
 - [ ] Implement crafting and inventory management
 - [ ] Add basic combat mechanics
 - [ ] Improve world generation performance
 
 ### Medium-term Goals
+
 - [ ] Multi-world support with portals
 - [ ] Custom block behaviors
 - [ ] Enhanced mob AI and pathfinding
 - [ ] In-game scripting API
 
 ### Long-term Goals
+
 - [ ] Distributed server architecture for massive worlds
 - [ ] Machine learning for adaptive mob behavior
 - [ ] Real-time ray-traced lighting system
