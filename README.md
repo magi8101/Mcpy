@@ -1,5 +1,5 @@
 # MCPy: High-Performance Minecraft Server Engine
-# please visit our error log [error-log](https://github.com/magi8101/Mcpy/tree/main/errorlog) and contributions are welcomed for solving error 
+# please visit our error log [error-log](https://github.com/magi8101/Mcpy/blob/main/errorlog/error-1.md) and contributions are welcomed for solving error 
 
 > **Note:** _MCPy is currently in active development, is **not completed**, and contains many errors. We are working hard to resolve outstanding issues. Your contributions are highly welcomed!_
 
