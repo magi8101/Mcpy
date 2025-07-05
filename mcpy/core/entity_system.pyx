@@ -134,9 +134,6 @@ logger = logging.getLogger("mcpy.entity_system")
 
 cdef class EntityPhysics:
     """Handles physics simulation for entities."""
-    cdef:
-        object world_engine
-        
     def __cinit__(self, object world_engine):
         self.world_engine = world_engine
         
@@ -263,26 +260,6 @@ cdef class EntityPhysics:
 
 cdef class Entity:
     """Base class for all entities in the game."""
-    cdef:
-        public uint64_t id
-        public int entity_type
-        public double x
-        public double y
-        public double z
-        public float yaw
-        public float pitch
-        public double velocity_x
-        public double velocity_y
-        public double velocity_z
-        public double width
-        public double height
-        public bint on_ground
-        public bint affected_by_gravity
-        public bint active
-        public uint64_t last_active_time
-        public dict data
-        public int32_t chunk_x
-        public int32_t chunk_z
         
     def __cinit__(self, int entity_type, double x, double y, double z):
         self.entity_type = entity_type
@@ -348,15 +325,6 @@ cdef class Entity:
 
 cdef class PlayerEntity(Entity):
     """Represents a player in the game."""
-    cdef:
-        public str username
-        public object uuid
-        public int health
-        public int food_level
-        public float experience
-        public int level
-        public dict inventory
-        public object connection
         
     def __cinit__(self, str username, object uuid_obj, double x, double y, double z):
         super().__init__(EntityType.PLAYER, x, y, z)
@@ -505,12 +473,6 @@ cdef class MobEntity(Entity):
 
 cdef class ItemEntity(Entity):
     """Represents an item in the world."""
-    cdef:
-        public int item_id
-        public int count
-        public dict metadata
-        public uint64_t pickup_delay
-        public uint64_t despawn_time
         
     def __cinit__(self, int item_id, int count, double x, double y, double z):
         super().__init__(EntityType.ITEM, x, y, z)
@@ -567,11 +529,6 @@ cdef class ItemEntity(Entity):
 
 cdef class ProjectileEntity(Entity):
     """Base class for projectiles like arrows."""
-    cdef:
-        public Entity shooter
-        public double damage
-        public uint64_t creation_time
-        public uint64_t max_age
         
     def __cinit__(self, int entity_type, Entity shooter, double x, double y, double z, double velocity_x, double velocity_y, double velocity_z):
         super().__init__(entity_type, x, y, z)
@@ -626,12 +583,6 @@ cdef class EntityTracker:
     Tracks and manages entities in the world with safe operations.
     Provides thread-safe operations on the entity collection.
     """
-    cdef:
-        public dict entities
-        public dict entities_by_type
-        public dict entities_by_chunk
-        public int max_entities
-        public object entity_lock
         
     def __cinit__(self, int max_entities=MAX_ENTITIES):
         self.entities = {}
@@ -783,13 +734,6 @@ cdef class EntityTracker:
 
 cdef class EntitySystem:
     """Main entity management system with improved error handling and tracking."""
-    cdef:
-        public object world_engine
-        public dict players
-        public EntityPhysics physics
-        public EntityFactory factory
-        public EntityTracker tracker
-        public int max_entities
         
     def __cinit__(self, object world_engine, int max_entities=MAX_ENTITIES):
         self.world_engine = world_engine

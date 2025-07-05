@@ -59,7 +59,6 @@ logger = logging.getLogger("mcpy.server_core")
 
 # Performance metrics
 cdef class PerformanceMetrics:
-    cdef:
         public double last_tick_duration
         public double avg_tick_duration
         public double min_tick_duration
@@ -122,7 +121,6 @@ cdef class PerformanceMetrics:
         }
         
 cdef class ServerConfiguration:
-    cdef:
         public str host
         public int port
         public str world_path
