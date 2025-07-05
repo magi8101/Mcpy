@@ -130,6 +130,18 @@ MCPy is designed for high performance. Please keep these principles in mind:
 4. Test performance on various hardware configurations
 5. Document performance characteristics of new features
 
+## Current Build/Contribution Blockers
+
+We are currently experiencing several Cython compilation errors in `mcpy/core/entity_system.pyx` and related files. **Community assistance is highly encouraged to help resolve these errors.** 
+
+Please see `CYTHON_ERROR.md` in the repository for the complete error log and details. A summary of the issues:
+
+- C attributes (like `health`, `max_health`, `ai_controller`, `hostile`) are being redeclared in the `.pyx` file, but were already declared in the corresponding `.pxd` file (`C attributes cannot be added in implementation part of extension type defined in a pxd`).
+- Several methods declared in the `.pxd` file (such as `can_attack`, `attack`, `_get_attack_damage`, `can_breed`, `breed`, `add_passenger`, `remove_passenger`, `create_entity`, `_configure_mob_properties`, `_get_mob_health`) are **not defined** in the `.pyx` file (`C method ... is declared but not defined`).
+- There are warnings about `noexcept` clauses being ignored for functions returning Python objects.
+
+**If you have experience with Cython or similar issues, your contributions or suggestions would be extremely helpful!**
+
 ## Additional Notes
 
 ### Git Workflow
@@ -153,3 +165,5 @@ MCPy is designed for high performance. Please keep these principles in mind:
 ## Thank You!
 
 Your contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+---
