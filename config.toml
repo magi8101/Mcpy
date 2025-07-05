@@ -1,0 +1,156 @@
+# MCPy Server Configuration
+
+[server]
+# Server name displayed in the server list
+name = "MCPy High-Performance Server"
+
+# Server host and port
+host = "0.0.0.0"
+port = 25565
+
+# Maximum number of players allowed
+max_players = 100
+
+# View distance in chunks (2-32)
+view_distance = 10
+
+# Enable online mode for authentication
+online_mode = true
+
+# Enable whitelist
+whitelist = false
+
+[world]
+# World generation seed (integer)
+seed = 42
+
+# World name
+name = "MCPy World"
+
+# Enable structures
+generate_structures = true
+
+# World type: default, flat, amplified
+type = "default"
+
+# Game rules
+[world.rules]
+do_daylight_cycle = true
+do_weather_cycle = true
+keep_inventory = false
+mob_griefing = true
+natural_regeneration = true
+
+# Performance settings
+[performance]
+# Entity processing range in chunks
+entity_processing_range = 4
+
+# Enable parallel chunk generation
+parallel_chunk_generation = true
+
+# Thread pool size for async operations
+thread_pool_size = 4
+
+# Maximum number of pending chunk operations
+max_chunk_operations = 64
+
+# Memory settings
+[performance.memory]
+# Maximum chunk cache size
+max_chunks_loaded = 3200
+
+# Enable memory pooling for entities
+use_memory_pooling = true
+
+# Network settings
+[network]
+# Compression threshold in bytes
+compression_threshold = 512
+
+# Enable encryption
+encryption = true
+
+# Network tick rate independent of game tick
+network_tick_rate = 20
+
+# Connection timeout in seconds
+timeout = 30
+
+# Plugin system
+[plugins]
+# Enable the plugin system
+enabled = false
+
+# Plugin directory
+directory = "plugins"
+
+# Auto-reload plugins on change
+auto_reload = false
+
+# Monitoring and metrics
+[monitoring]
+# Enable Prometheus monitoring
+enabled = false
+
+# Prometheus metrics port
+port = 9090
+
+# Enable detailed profiling
+detailed_profiling = false
+
+# Save profiling data to disk
+save_profiling_data = false
+
+# Debug settings
+[debug]
+# Enable debug logging
+debug_logging = false
+
+# Log entity updates
+log_entity_updates = false
+
+# Log chunk operations
+log_chunk_operations = false
+
+# Scientific computing settings
+[science]
+# Use SciPy for terrain generation
+use_scipy = true
+
+# Use Noise library for terrain generation
+use_noise = true
+
+# Use NumPy for entity physics
+use_numpy = true
+
+# Use AI for mob behavior (requires PyTorch)
+use_ai = false
+
+[database]
+# Database type (sqlite, postgresql)
+type = "sqlite"
+
+# Database file path for SQLite
+path = "world/mcpy.db"
+
+# PostgreSQL settings (if using PostgreSQL)
+# host = "localhost"
+# port = 5432
+# dbname = "mcpy"
+# user = "postgres"
+# password = ""
+
+# Database pool configuration
+pool_size = 10
+max_overflow = 20
+pool_timeout = 30
+
+# Auto-save interval in seconds
+auto_save_interval = 300  # 5 minutes
+
+# Create tables if they don't exist
+create_tables = true
+
+# Enable SQL query logging (development only)
+echo = false

@@ -1,0 +1,62 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+*.dll
+*.pyd
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-*
+
+# Generated Cython files
+*.c
+*.cpp
+*.html
+
+# Minecraft server specific
+world/
+logs/
+*.log
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temp files
+*.tmp
+*.bak
+.DS_Store
+
+# Compiled Python modules
+*.pyo
+
+# Test cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables
+.env
+
+# Benchmark results
+benchmarks/results/
+
+# VS Code workspace files
+*.code-workspace
