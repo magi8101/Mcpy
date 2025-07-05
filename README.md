@@ -1,215 +1,182 @@
 # MCPy: High-Performance Minecraft Server Engine
 
+> **Note:** _MCPy is currently in active development, is **not completed**, and contains many errors. We are working hard to resolve outstanding issues. Your contributions are highly welcomed!_
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Cython](https://img.shields.io/badge/Cython-0.29.34+-darkgreen.svg)](https://cython.org/)
 
-A production-grade, ultra-optimized Minecraft server engine built with Python, Cython, and scientific computing libraries. This project aims to deliver exceptional performance while maintaining the flexibility and accessibility of Python.
+---
 
-## 🚀 Key Features
+MCPy is a next-generation, ultra-optimized Minecraft server engine, blending the power of Python, Cython, and advanced scientific computing libraries. Our aim is to deliver exceptional performance and flexibility, making Minecraft server development accessible and future-proof.
 
-- **Ultra-optimized Core**: Cython-accelerated server core achieving near-C performance
-- **Scientific Computing Foundation**: Leverages NumPy, SciPy, and Polars for high-performance operations
-- **Zero-overhead Networking**: Asynchronous, non-blocking network stack with protocol optimization
-- **Advanced Entity System**: Efficient entity management with specialized AI behaviors
-- **ORM-based Persistence**: PostgreSQL integration with SQLAlchemy for robust data storage
-- **Comprehensive Benchmarking**: Built-in performance analysis and optimization tools
-- **Plugin Framework**: Extensible architecture for custom server modifications
-- **Real-time Monitoring**: Prometheus/Grafana integration for server metrics
+---
 
-## 📐 Architecture
+## 🚧 Project Status
 
-MCPy is built on five specialized core modules, each carefully designed for maximum performance:
+- **This project is NOT COMPLETED and currently contains many known errors.**
+- Major features are still under development and the codebase is unstable.
+- Contributions and bug reports are highly appreciated to help us reach a stable release.
 
-1. **`server_core.pyx`**: Central server management
+---
 
-   - Event-driven architecture for request handling
-   - Efficient worker thread pool management
-   - Optimized tick system with adaptive timing
-   - Performance profiling and bottleneck detection
+## 🚀 Features at a Glance
 
-2. **`world_engine.pyx`**: Procedural world generation
+- **Blazing Fast Core**: Cython-accelerated, event-driven server engine with near-C performance.
+- **Scientific Computing Backbone**: Integrates NumPy, SciPy, and Polars for high-performance operations.
+- **Zero-Overhead Networking**: Asynchronous, non-blocking, protocol-optimized networking.
+- **Sophisticated Entity System**: Efficient, extensible entity management supporting advanced AI behaviors.
+- **Robust Persistence Layer**: PostgreSQL and SQLAlchemy-powered ORM for reliable data storage.
+- **Comprehensive Benchmarking**: Built-in performance analytics and profiling tools.
+- **Extensible Plugin Framework**: Easily add server modifications with minimal friction.
+- **Real-time Monitoring**: First-class Prometheus & Grafana integration for live metrics.
 
-   - Scientifically accurate noise generation algorithms
-   - Multi-threaded chunk generation and loading
-   - Memory-efficient terrain representation
-   - Advanced biome generation systems
+---
 
-3. **`network_core.pyx`**: High-performance networking
+## 📐 Architecture Overview
 
-   - Zero-copy packet serialization
-   - Protocol-level compression and optimization
-   - Connection pooling and management
-   - DDoS protection mechanisms
+MCPy is modular by design, comprising five high-performance core components:
 
-4. **`entity_system.pyx`**: Efficient entity lifecycle management
+### 1. `server_core.pyx`
+- Event-driven request handling
+- Adaptive, high-precision tick system
+- Dynamic worker thread pool management
+- Real-time performance profiling & bottleneck detection
 
-   - Spatial hash-based entity tracking
-   - Multi-threaded physics simulation
-   - AI behavior system with path-finding
-   - Memory-efficient entity representation
+### 2. `world_engine.pyx`
+- Procedural terrain with multi-octave noise & advanced biome transitions
+- Multi-threaded chunk generation & memory-efficient terrain storage
+- Complex structure and cave generation algorithms
 
-5. **`persistence`**: Database integration
-   - SQLAlchemy ORM for PostgreSQL/SQLite data storage
-   - Efficient chunk serialization and compression
-   - Transactional world state management
-   - Optimized query patterns for game data
+### 3. `network_core.pyx`
+- Zero-copy packet serialization & protocol-level compression
+- Robust connection pooling & DDoS mitigation
+
+### 4. `entity_system.pyx`
+- Spatial hash-based entity tracking, multi-threaded physics simulation
+- Modular AI behavior trees & efficient entity representation
+
+### 5. `persistence`
+- SQLAlchemy ORM for PostgreSQL/SQLite
+- Efficient chunk serialization, transactional world state, and optimized queries
+
+---
 
 ## 📊 Performance Goals
 
-- **Scalability**: Maintain 20 TPS with 100+ concurrent players
-- **Memory Efficiency**: Keep memory usage under 2GB for 10,000 chunks
-- **Low Latency**: Achieve < 50ms latency per player action
-- **Reliability**: Implement 100% test coverage for core modules
-- **Throughput**: Process 10,000+ entity updates per tick
+| Metric                | Target Value                          |
+|-----------------------|---------------------------------------|
+| Scalability           | 20 TPS with 100+ concurrent players   |
+| Memory Usage          | < 2GB for 10,000 chunks               |
+| Latency               | < 50ms per player action              |
+| Reliability           | 100% test coverage for core modules   |
+| Throughput            | 10,000+ entity updates per tick       |
 
-## ⚙️ Technical Implementation
+---
 
-### Cython Optimization Strategies
+## ⚙️ Technical Highlights
 
-MCPy uses several advanced Cython techniques to achieve C-like performance:
+### Cython & Performance
+- Static typing with `cdef`, aggressive use of compiler directives
+- Direct NumPy buffer access, pointer arithmetic for critical paths
+- Multi-threaded parallelism using thread pools
 
-- Static typing with `cdef` variables and functions
-- Memory management with pointer arithmetic where necessary
-- Compiler directives for bounds checking and wraparound elimination
-- Numpy integration with direct buffer access
-- Efficient parallelization with thread pools
+### Entity System
+- Hierarchical, component-based design
+- Spatial partitioning for O(1) lookup
+- Custom memory pools & adaptive Level-of-Detail (LOD)
 
-### Entity System Design
+### World Generation
+- Multi-octave Perlin/Simplex noise
+- Voronoi-based biome transitions
+- Erosion, cave, and structure algorithms
+- 10x chunk compression for storage efficiency
 
-The entity system features:
-
-- Hierarchical class structure for specialized entity behaviors
-- Spatial partitioning for O(1) entity lookup in areas of interest
-- Component-based design for extensibility
-- Custom memory pools for entity allocation
-- Adaptive entity LOD (Level of Detail) based on distance
-
-### World Generation Algorithm
-
-World generation implements:
-
-- Multi-octave Perlin and Simplex noise combinations
-- Biome transitions using Voronoi diagrams
-- Scientifically accurate erosion and cave formation algorithms
-- Structure generation using grammar-based systems
-- Custom chunk compression for 10x storage efficiency
+---
 
 ## 📦 Installation
 
 ### Prerequisites
+- Python 3.9+ (3.11+ recommended)
+- Modern C++ compiler (VS 2019+/GCC 9+)
+- PostgreSQL 13+ (for production)
+- Minimum 8GB RAM (16GB recommended)
 
-- Python 3.9+ (3.11 recommended for best performance)
-- C++ compiler (Visual Studio 2019+ on Windows, GCC 9+ on Linux)
-- PostgreSQL 13+ (optional, for production environments)
-- 8GB RAM minimum (16GB recommended)
-
-### Quick Setup (Windows/Linux/macOS)
+### Quick Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/magi8101/mcpy.git
 cd mcpy
-
-# Run the all-in-one setup script
-# On Windows:
+# Windows
 setup.bat
-
-# On Linux/macOS:
+# Linux/macOS
 chmod +x setup.sh
 ./setup.sh
 ```
 
-This script handles:
-
-- Setting up a virtual environment
-- Installing all dependencies
-- Building Cython modules
-- Initializing Git repository
-
-### Manual Installation (Windows/Linux/macOS)
+### Manual Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/magi8101/mcpy.git
 cd mcpy
-
-# Create a virtual environment
 python -m venv .venv
-# On Windows:
+# Windows:
 .venv\Scripts\activate
-# On Linux/macOS:
+# Linux/macOS:
 source .venv/bin/activate
-
-# Install dependencies from requirements file
 pip install -r _requirements.txt
-
-# Install the package in development mode
 pip install -e ".[dev]"
-
-# Optional AI features (requires extra CPU/GPU resources)
-pip install -e ".[ai]"
-
-# Verify dependencies are correctly installed
+pip install -e ".[ai]"  # Optional: Enable AI features
 python check_dependencies.py
-
-# Rebuild Cython modules
 python setup.py build_ext --inplace
 ```
+
+---
 
 ## 🚀 Running the Server
 
 ```bash
-# Using the setup scripts to run the server
-# On Windows:
+# Run using setup scripts
+# Windows:
 setup.bat run
-
-# On Linux/macOS:
+# Linux/macOS:
 ./setup.sh run
 
-# Basic server start from command line
+# Directly from the command line
 python -m mcpy.server
-
-# With custom config and world path
 python -m mcpy.server --config custom_config.toml --world my_world
-
-# Performance mode with additional optimizations
 python -m mcpy.server --performance-mode --max-players 100
-
-# Debug mode with increased logging
 python -m mcpy.server --debug --log-level debug
 ```
 
-### Command Line Options
+#### Command Line Options
 
 | Option                   | Description                             |
-| ------------------------ | --------------------------------------- |
-| `--config PATH`          | Path to custom TOML configuration file  |
-| `--world PATH`           | Path to world directory                 |
+|--------------------------|-----------------------------------------|
+| `--config PATH`          | Path to TOML config file                |
+| `--world PATH`           | World directory                         |
 | `--port NUMBER`          | Network port (default: 25565)           |
-| `--max-players NUMBER`   | Maximum number of players (default: 20) |
+| `--max-players NUMBER`   | Max players (default: 20)               |
 | `--view-distance NUMBER` | Chunk view distance (default: 10)       |
-| `--performance-mode`     | Enables additional optimizations        |
-| `--debug`                | Enables debug mode                      |
-| `--log-level LEVEL`      | Set logging level (default: info)       |
+| `--performance-mode`     | Extra performance optimizations         |
+| `--debug`                | Enable debug mode                       |
+| `--log-level LEVEL`      | Set log level (default: info)           |
 | `--backup`               | Enable automatic backups                |
+
+---
 
 ## 🗄️ Database Configuration
 
-MCPy supports both SQLite (for development) and PostgreSQL (for production) databases. Configure these settings in your `config.toml` file:
-
 ### SQLite (Default)
-
 ```toml
 [database]
 type = "sqlite"
 path = "world/mcpy.db"
-journal_mode = "WAL"  # Write-Ahead Logging for better concurrency
-synchronous = "NORMAL"  # Balance between safety and performance
+journal_mode = "WAL"
+synchronous = "NORMAL"
 ```
 
-### PostgreSQL (Recommended for Production)
-
+### PostgreSQL (Production)
 ```toml
 [database]
 type = "postgresql"
@@ -220,35 +187,28 @@ user = "postgres"
 password = "your_password"
 pool_size = 10
 max_overflow = 20
-echo = false  # Set to true for query debugging
+echo = false
 ```
 
-## 💾 Persistence Implementation
+---
 
-The persistence layer uses SQLAlchemy ORM with these key features:
+## 💾 Persistence Features
 
-- **Transactional World Saving**:
-
+- **Transactional World Saving**
   ```python
   with session.begin():
       for chunk in dirty_chunks:
           session.add(ChunkModel.from_chunk(chunk))
   ```
-
-- **Efficient Chunk Serialization**:
-
+- **Efficient Chunk Serialization**
   ```python
-  # Chunks are serialized using NumPy's efficient binary format
   chunk_data = np.savez_compressed(io_buffer,
                                   blocks=chunk.blocks,
                                   heightmap=chunk.heightmap,
                                   biomes=chunk.biomes)
   ```
-
-- **Player Data Management**:
-
+- **Player Data Management**
   ```python
-  # Player data is stored as a JSON document with binary inventories
   player_model = PlayerModel(
       uuid=player.uuid,
       username=player.username,
@@ -257,75 +217,58 @@ The persistence layer uses SQLAlchemy ORM with these key features:
       stats=json.dumps(player.stats)
   )
   ```
+- **Intelligent Auto-saving**: Tracks and saves only modified chunks/entities
+- **Automated Backups**: Configurable intervals & retention
 
-- **Auto-saving System**:
-  Implements an intelligent dirty-tracking system that only saves modified chunks and entities.
-- **Backup Management**:
-  Automated world backups with configurable intervals and retention policies.
+---
 
-## 🧪 Development and Testing
+## 🧪 Development & Testing
 
 ```bash
-# Run the full test suite
-pytest
-
-# Run only entity system tests
-pytest tests/test_entity_system.py
-
-# Run benchmarks
-python -m benchmarks.benchmark
-
-# Profile a specific module
-python -m mcpy.profiling.profile_module world_engine
-
-# Generate test coverage report
-pytest --cov=mcpy --cov-report=html
+pytest                  # Run full test suite
+pytest tests/test_entity_system.py     # Entity system tests
+python -m benchmarks.benchmark        # Benchmarks
+python -m mcpy.profiling.profile_module world_engine  # Profile module
+pytest --cov=mcpy --cov-report=html   # Test coverage report
 ```
 
-### Performance Tuning
+### Performance Tuning Examples
 
-1. **Entity System Optimization**:
+- **Entity System**
+  ```python
+  entity_spatial_hash = {(int(e.x/16), int(e.z/16)): [] for e in entities}
+  for entity in entities:
+      entity_spatial_hash[(int(entity.x/16), int(entity.z/16))].append(entity)
+  ```
+- **World Engine**
+  ```python
+  with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+      futures = [executor.submit(generate_chunk, x, z) for x, z in chunk_coords]
+      chunks = [f.result() for f in futures]
+  ```
+- **Network Optimization**
+  ```python
+  cdef char* buffer = <char*>malloc(packet_size)
+  memcpy(buffer, &packet_header, sizeof(packet_header))
+  memcpy(buffer + sizeof(packet_header), packet_data, packet_data_size)
+  ```
 
-   ```python
-   # Use spatial hashing for entity collision detection
-   entity_spatial_hash = {(int(e.x/16), int(e.z/16)): [] for e in entities}
-   for entity in entities:
-       entity_spatial_hash[(int(entity.x/16), int(entity.z/16))].append(entity)
-   ```
-
-2. **World Engine Tuning**:
-
-   ```python
-   # Parallelize chunk generation
-   with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-       futures = [executor.submit(generate_chunk, x, z) for x, z in chunk_coords]
-       chunks = [f.result() for f in futures]
-   ```
-
-3. **Network Optimization**:
-   ```python
-   # Use zero-copy buffer protocol for packet serialization
-   cdef char* buffer = <char*>malloc(packet_size)
-   memcpy(buffer, &packet_header, sizeof(packet_header))
-   memcpy(buffer + sizeof(packet_header), packet_data, packet_data_size)
-   ```
+---
 
 ## 🔧 Advanced Features
 
 ### Plugin System
 
-MCPy includes a powerful plugin system that allows for server extensions without modifying core code:
+Add custom commands and behaviors easily:
 
 ```python
-# Example plugin: Custom command handler
 from mcpy.plugins import Plugin, event
 
 class TeleportPlugin(Plugin):
     @event("player.command")
     def on_command(self, player, command, args):
         if command == "tp" and len(args) >= 1:
-            target_name = args[0]
-            target = self.server.get_player_by_name(target_name)
+            target = self.server.get_player_by_name(args[0])
             if target:
                 player.teleport(target.x, target.y, target.z)
                 return True
@@ -334,10 +277,9 @@ class TeleportPlugin(Plugin):
 
 ### Real-time Monitoring
 
-Integrate with Prometheus and Grafana for comprehensive server monitoring:
+Integrated Prometheus/Grafana support:
 
-```python
-# In your server configuration
+```toml
 [monitoring]
 enabled = true
 prometheus_port = 9090
@@ -346,21 +288,18 @@ metrics = ["tps", "memory_usage", "players_online", "chunks_loaded"]
 
 ### AI Entity Behaviors
 
-Advanced entity AI using behavior trees and pathfinding:
+Highly flexible AI system using behavior trees:
 
 ```python
-# Example of AI behavior system implementation
 class ZombieAI(MobAI):
     def setup_behaviors(self):
         self.behaviors = BehaviorTree(
             Selector([
-                # Attack nearby players
                 Sequence([
                     CheckPlayerNearby(radius=16),
                     PathfindToPlayer(),
                     AttackPlayer()
                 ]),
-                # Wander around
                 Sequence([
                     Wait(random.randint(20, 100)),
                     MoveToRandomPosition(radius=10)
@@ -369,39 +308,44 @@ class ZombieAI(MobAI):
         )
 ```
 
-## 🗺️ Development Roadmap
+---
 
-### Short-term Goals
+## 🗺️ Roadmap
 
-- [ ] Complete entity collision system
-- [ ] Implement crafting and inventory management
-- [ ] Add basic combat mechanics
-- [ ] Improve world generation performance
+### Short-Term
+- [ ] Entity collision system
+- [ ] Crafting & inventory management
+- [ ] Basic combat mechanics
+- [ ] World generation optimization
 
-### Medium-term Goals
-
-- [ ] Multi-world support with portals
+### Medium-Term
+- [ ] Multi-world support & portals
 - [ ] Custom block behaviors
-- [ ] Enhanced mob AI and pathfinding
+- [ ] Enhanced mob AI
 - [ ] In-game scripting API
 
-### Long-term Goals
+### Long-Term
+- [ ] Distributed server architecture
+- [ ] Machine learning-driven mob AI
+- [ ] Real-time ray-traced lighting
+- [ ] Custom physics engine
 
-- [ ] Distributed server architecture for massive worlds
-- [ ] Machine learning for adaptive mob behavior
-- [ ] Real-time ray-traced lighting system
-- [ ] Custom physics engine optimizations
+---
 
-## 📝 Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Please check out our [Contributing Guide](CONTRIBUTING.md) to get started.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) to get started:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+4. Push to your branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for full details.
+
+---
