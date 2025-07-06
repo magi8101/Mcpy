@@ -326,8 +326,35 @@ cdef class Entity:
 cdef class PlayerEntity(Entity):
     """Represents a player in the game."""
         
-    def __cinit__(self, str username, object uuid_obj, double x, double y, double z):
-        super().__init__(EntityType.PLAYER, x, y, z)
+    def __cinit__(self, *args, **kwargs):
+        # Skip Entity.__cinit__ by using different signature
+        pass
+        
+    def __init__(self, str username, object uuid_obj, double x, double y, double z):
+        # Manually initialize Entity fields since we have different constructor signature
+        self.entity_type = EntityType.PLAYER
+        self.x = x
+        self.y = y
+        self.z = z
+        self.yaw = 0.0
+        self.pitch = 0.0
+        self.velocity_x = 0.0
+        self.velocity_y = 0.0
+        self.velocity_z = 0.0
+        self.width = 0.6  # Player width
+        self.height = 1.8  # Player height
+        self.on_ground = False
+        self.affected_by_gravity = True
+        self.active = True
+        self.last_active_time = <uint64_t>time(NULL)
+        self.data = {}
+        self.chunk_x = <int32_t>(x / CHUNK_SIZE)
+        self.chunk_z = <int32_t>(z / CHUNK_SIZE)
+        
+        # Generate a unique ID for the entity
+        self.id = hash(uuid.uuid4())
+        
+        # Initialize PlayerEntity-specific fields
         self.username = username
         self.uuid = uuid_obj
         self.health = 20
@@ -397,14 +424,10 @@ cdef class PlayerEntity(Entity):
 
 cdef class MobEntity(Entity):
     """Base class for mobile entities with AI."""
-    cdef:
-        public int health
-        public int max_health
-        public object ai_controller
-        public bint hostile
         
     def __cinit__(self, int entity_type, double x, double y, double z, int health, bint hostile):
-        super().__init__(entity_type, x, y, z)
+        # Call Entity.__cinit__ explicitly with proper args
+        Entity.__cinit__(self, entity_type, x, y, z)
         self.health = health
         self.max_health = health
         self.ai_controller = None
@@ -471,11 +494,282 @@ cdef class MobEntity(Entity):
         # Drop items, award experience, etc.
         self.active = False
 
+cdef class HostileMobEntity(MobEntity):
+    """Hostile mob entities that can attack."""
+    
+    def __cinit__(self, int entity_type, double x, double y, double z, int health):
+        # Call MobEntity.__cinit__ explicitly with proper args
+        MobEntity.__cinit__(self, entity_type, x, y, z, health, True)
+        self.attack_damage = 1.0
+        self.attack_range = 2.0
+        self.detection_range = 16.0
+        self.attack_cooldown = 20  # 1 second at 20 TPS
+        self.last_attack_time = 0
+        
+    cpdef void update(self, uint64_t tick_number):
+        """Update the hostile mob entity."""
+        super().update(tick_number)
+        # Add hostile AI logic here
+        
+    cpdef dict to_data(self):
+        """Convert the hostile mob to a data dictionary."""
+        data = super().to_data()
+        data.update({
+            'attack_damage': self.attack_damage,
+            'attack_range': self.attack_range,
+            'detection_range': self.detection_range,
+            'attack_cooldown': self.attack_cooldown,
+            'last_attack_time': self.last_attack_time,
+        })
+        return data
+        
+    cpdef bint can_attack(self, uint64_t current_tick) except? False:
+        """Check if the mob can attack."""
+        return (current_tick - self.last_attack_time) >= self.attack_cooldown
+        
+    cpdef void attack(self, Entity target, uint64_t current_tick):
+        """Attack a target entity."""
+        if self.can_attack(current_tick) and target is not None:
+            # Apply damage to target if it's a mob or player
+            if isinstance(target, MobEntity):
+                (<MobEntity>target).damage(<int>self.attack_damage, self)
+            elif isinstance(target, PlayerEntity):
+                # Handle player damage
+                player = <PlayerEntity>target
+                player.health = max(0, player.health - <int>self.attack_damage)
+            self.last_attack_time = current_tick
+            
+    cdef double _get_attack_damage(self, int entity_type):
+        """Get the attack damage for a specific entity type."""
+        # Basic damage values - can be expanded
+        if entity_type == EntityType.ZOMBIE:
+            return 3.0
+        elif entity_type == EntityType.SKELETON:
+            return 2.5
+        elif entity_type == EntityType.CREEPER:
+            return 8.0  # Explosion damage
+        elif entity_type == EntityType.SPIDER:
+            return 2.0
+        else:
+            return 1.0
+
+cdef class PassiveMobEntity(MobEntity):
+    """Passive mob entities that can breed."""
+    
+    def __cinit__(self, int entity_type, double x, double y, double z, int health):
+        # Call MobEntity.__cinit__ explicitly with proper args
+        MobEntity.__cinit__(self, entity_type, x, y, z, health, False)
+        self.breeding_cooldown = 6000  # 5 minutes at 20 TPS
+        self.last_bred_time = 0
+        self.is_baby = False
+        self.growth_time = 24000  # 20 minutes at 20 TPS
+        
+    cpdef void update(self, uint64_t tick_number):
+        """Update the passive mob entity."""
+        super().update(tick_number)
+        # Handle baby growth
+        if self.is_baby and (tick_number - self.last_bred_time) >= self.growth_time:
+            self.is_baby = False
+            
+    cpdef dict to_data(self):
+        """Convert the passive mob to a data dictionary."""
+        data = super().to_data()
+        data.update({
+            'breeding_cooldown': self.breeding_cooldown,
+            'last_bred_time': self.last_bred_time,
+            'is_baby': self.is_baby,
+            'growth_time': self.growth_time,
+        })
+        return data
+        
+    cpdef bint can_breed(self, uint64_t current_tick) except? False:
+        """Check if the mob can breed."""
+        return not self.is_baby and (current_tick - self.last_bred_time) >= self.breeding_cooldown
+        
+    cpdef PassiveMobEntity breed(self, PassiveMobEntity partner, uint64_t current_tick):
+        """Breed with another passive mob."""
+        if self.can_breed(current_tick) and partner.can_breed(current_tick):
+            # Create a baby mob of the same type
+            baby = PassiveMobEntity(self.entity_type, self.x, self.y, self.z, self.max_health)
+            baby.is_baby = True
+            baby.last_bred_time = current_tick
+            
+            # Update parent breeding times
+            self.last_bred_time = current_tick
+            partner.last_bred_time = current_tick
+            
+            return baby
+        return None
+
+cdef class VehicleEntity(Entity):
+    """Vehicle entities that can carry passengers."""
+    
+    def __cinit__(self, int entity_type, double x, double y, double z):
+        # Call Entity.__cinit__ explicitly with proper args
+        Entity.__cinit__(self, entity_type, x, y, z)
+        self.passengers = []
+        self.max_speed = 8.0
+        self.acceleration = 0.1
+        self.deceleration = 0.05
+        self.is_powered = False
+        
+    cpdef void update(self, uint64_t tick_number):
+        """Update the vehicle entity."""
+        super().update(tick_number)
+        # Handle vehicle physics and passenger updates
+        
+    cpdef dict to_data(self):
+        """Convert the vehicle to a data dictionary."""
+        data = super().to_data()
+        data.update({
+            'passengers': [p.id for p in self.passengers],
+            'max_speed': self.max_speed,
+            'acceleration': self.acceleration,
+            'deceleration': self.deceleration,
+            'is_powered': self.is_powered,
+        })
+        return data
+        
+    cpdef bint add_passenger(self, Entity entity) except? False:
+        """Add a passenger to the vehicle."""
+        if entity is not None and entity not in self.passengers:
+            self.passengers.append(entity)
+            return True
+        return False
+        
+    cpdef bint remove_passenger(self, Entity entity) except? False:
+        """Remove a passenger from the vehicle."""
+        if entity is not None and entity in self.passengers:
+            self.passengers.remove(entity)
+            return True
+        return False
+
+cdef class FallingBlockEntity(Entity):
+    """Falling block entities."""
+    
+    def __cinit__(self, uint8_t block_id, uint8_t data_value, double x, double y, double z):
+        # Call Entity.__cinit__ explicitly with proper args
+        Entity.__cinit__(self, EntityType.FALLING_BLOCK, x, y, z)
+        self.block_id = block_id
+        self.data_value = data_value
+        self.time_existed = 0
+        self.can_hurt_entities = True
+        
+    cpdef void update(self, uint64_t tick_number):
+        """Update the falling block entity."""
+        super().update(tick_number)
+        self.time_existed += 1
+        
+        # Check if block should stop falling
+        if self.on_ground or self.time_existed > 6000:  # 5 minutes max fall time
+            self.active = False
+            
+    cpdef dict to_data(self):
+        """Convert the falling block to a data dictionary."""
+        data = super().to_data()
+        data.update({
+            'block_id': self.block_id,
+            'data_value': self.data_value,
+            'time_existed': self.time_existed,
+            'can_hurt_entities': self.can_hurt_entities,
+        })
+        return data
+
+cdef class EntityFactory:
+    """Factory for creating entities."""
+    
+    def __cinit__(self, object world_engine):
+        self.world_engine = world_engine
+        
+    cpdef Entity create_entity(self, int entity_type, double x, double y, double z, dict additional_data=None):
+        """Create an entity of the specified type."""
+        if additional_data is None:
+            additional_data = {}
+            
+        cdef Entity entity = None
+        
+        # Create different entity types
+        if entity_type == EntityType.PLAYER:
+            # Players should be created via EntitySystem.add_player
+            return None
+        elif entity_type in [EntityType.ZOMBIE, EntityType.SKELETON, EntityType.CREEPER, EntityType.SPIDER]:
+            # Hostile mobs
+            health = self._get_mob_health(entity_type)
+            entity = HostileMobEntity(entity_type, x, y, z, health)
+            self._configure_mob_properties(<MobEntity>entity, entity_type, additional_data)
+        elif entity_type in [EntityType.PIG, EntityType.COW, EntityType.SHEEP, EntityType.CHICKEN]:
+            # Passive mobs
+            health = self._get_mob_health(entity_type)
+            entity = PassiveMobEntity(entity_type, x, y, z, health)
+            self._configure_mob_properties(<MobEntity>entity, entity_type, additional_data)
+        elif entity_type == EntityType.ITEM:
+            # Items
+            item_id = additional_data.get('item_id', 1)
+            count = additional_data.get('count', 1)
+            entity = ItemEntity(item_id, count, x, y, z)
+        elif entity_type in [EntityType.BOAT, EntityType.MINECART]:
+            # Vehicles
+            entity = VehicleEntity(entity_type, x, y, z)
+        elif entity_type == EntityType.FALLING_BLOCK:
+            # Falling blocks
+            block_id = additional_data.get('block_id', 1)
+            data_value = additional_data.get('data_value', 0)
+            entity = FallingBlockEntity(block_id, data_value, x, y, z)
+        else:
+            # Default to basic entity
+            entity = Entity(entity_type, x, y, z)
+            
+        return entity
+        
+    cdef void _configure_mob_properties(self, MobEntity mob, int entity_type, dict additional_data):
+        """Configure mob-specific properties."""
+        if mob is None:
+            return
+            
+        # Set entity-specific properties
+        if entity_type == EntityType.ZOMBIE:
+            mob.width = 0.6
+            mob.height = 1.95
+        elif entity_type == EntityType.SKELETON:
+            mob.width = 0.6
+            mob.height = 1.99
+        elif entity_type == EntityType.CREEPER:
+            mob.width = 0.6
+            mob.height = 1.7
+        elif entity_type == EntityType.PIG:
+            mob.width = 0.9
+            mob.height = 0.9
+        elif entity_type == EntityType.COW:
+            mob.width = 0.9
+            mob.height = 1.4
+            
+    cdef int _get_mob_health(self, int entity_type):
+        """Get the health for a specific mob type."""
+        if entity_type == EntityType.ZOMBIE:
+            return 20
+        elif entity_type == EntityType.SKELETON:
+            return 20
+        elif entity_type == EntityType.CREEPER:
+            return 20
+        elif entity_type == EntityType.SPIDER:
+            return 16
+        elif entity_type == EntityType.PIG:
+            return 10
+        elif entity_type == EntityType.COW:
+            return 10
+        elif entity_type == EntityType.SHEEP:
+            return 8
+        elif entity_type == EntityType.CHICKEN:
+            return 4
+        else:
+            return 20  # Default health
+
 cdef class ItemEntity(Entity):
     """Represents an item in the world."""
         
     def __cinit__(self, int item_id, int count, double x, double y, double z):
-        super().__init__(EntityType.ITEM, x, y, z)
+        # Call Entity.__cinit__ explicitly with proper args
+        Entity.__cinit__(self, EntityType.ITEM, x, y, z)
         self.item_id = item_id
         self.count = count
         self.metadata = {}
@@ -531,7 +825,8 @@ cdef class ProjectileEntity(Entity):
     """Base class for projectiles like arrows."""
         
     def __cinit__(self, int entity_type, Entity shooter, double x, double y, double z, double velocity_x, double velocity_y, double velocity_z):
-        super().__init__(entity_type, x, y, z)
+        # Call Entity.__cinit__ explicitly with proper args
+        Entity.__cinit__(self, entity_type, x, y, z)
         self.shooter = shooter
         self.velocity_x = velocity_x
         self.velocity_y = velocity_y
