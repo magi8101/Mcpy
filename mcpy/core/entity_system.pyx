@@ -261,11 +261,26 @@ cdef class EntityPhysics:
 cdef class Entity:
     """Base class for all entities in the game."""
         
-    def __cinit__(self, int entity_type, double x, double y, double z):
-        self.entity_type = entity_type
-        self.x = x
-        self.y = y
-        self.z = z
+    def __cinit__(self, *args, **kwargs):
+        # Flexible constructor that handles different argument patterns
+        if len(args) == 4:
+            # Normal Entity construction: (entity_type, x, y, z)
+            entity_type, x, y, z = args
+            self.entity_type = entity_type
+            self.x = x
+            self.y = y
+            self.z = z
+        elif len(args) == 0:
+            # Default constructor for subclasses that will initialize manually
+            self.entity_type = 0
+            self.x = 0.0
+            self.y = 0.0
+            self.z = 0.0
+        else:
+            # Let subclasses handle their own initialization
+            pass
+            
+        # Common initialization
         self.yaw = 0.0
         self.pitch = 0.0
         self.velocity_x = 0.0
@@ -278,8 +293,14 @@ cdef class Entity:
         self.active = True
         self.last_active_time = <uint64_t>time(NULL)
         self.data = {}
-        self.chunk_x = <int32_t>(x / CHUNK_SIZE)
-        self.chunk_z = <int32_t>(z / CHUNK_SIZE)
+        
+        # Set chunk coordinates if position is set
+        if hasattr(self, 'x') and hasattr(self, 'z'):
+            self.chunk_x = <int32_t>(self.x / CHUNK_SIZE)
+            self.chunk_z = <int32_t>(self.z / CHUNK_SIZE)
+        else:
+            self.chunk_x = 0
+            self.chunk_z = 0
         
         # Generate a unique ID for the entity
         self.id = hash(uuid.uuid4())
@@ -326,33 +347,20 @@ cdef class Entity:
 cdef class PlayerEntity(Entity):
     """Represents a player in the game."""
         
-    def __cinit__(self, *args, **kwargs):
-        # Skip Entity.__cinit__ by using different signature
+    def __cinit__(self, str username, object uuid_obj, double x, double y, double z):
+        # Entity.__cinit__ will be called with these args, but will be handled by flexible constructor
         pass
         
     def __init__(self, str username, object uuid_obj, double x, double y, double z):
-        # Manually initialize Entity fields since we have different constructor signature
+        # Initialize Entity fields specifically for PlayerEntity
         self.entity_type = EntityType.PLAYER
         self.x = x
         self.y = y
         self.z = z
-        self.yaw = 0.0
-        self.pitch = 0.0
-        self.velocity_x = 0.0
-        self.velocity_y = 0.0
-        self.velocity_z = 0.0
         self.width = 0.6  # Player width
         self.height = 1.8  # Player height
-        self.on_ground = False
-        self.affected_by_gravity = True
-        self.active = True
-        self.last_active_time = <uint64_t>time(NULL)
-        self.data = {}
         self.chunk_x = <int32_t>(x / CHUNK_SIZE)
         self.chunk_z = <int32_t>(z / CHUNK_SIZE)
-        
-        # Generate a unique ID for the entity
-        self.id = hash(uuid.uuid4())
         
         # Initialize PlayerEntity-specific fields
         self.username = username
@@ -426,8 +434,19 @@ cdef class MobEntity(Entity):
     """Base class for mobile entities with AI."""
         
     def __cinit__(self, int entity_type, double x, double y, double z, int health, bint hostile):
-        # Call Entity.__cinit__ explicitly with proper args
-        Entity.__cinit__(self, entity_type, x, y, z)
+        # Entity.__cinit__ will be called automatically, we just need to override specific fields
+        pass
+        
+    def __init__(self, int entity_type, double x, double y, double z, int health, bint hostile):
+        # Initialize Entity fields specifically for MobEntity  
+        self.entity_type = entity_type
+        self.x = x
+        self.y = y
+        self.z = z
+        self.chunk_x = <int32_t>(x / CHUNK_SIZE)
+        self.chunk_z = <int32_t>(z / CHUNK_SIZE)
+        
+        # Initialize MobEntity-specific fields
         self.health = health
         self.max_health = health
         self.ai_controller = None
@@ -498,8 +517,12 @@ cdef class HostileMobEntity(MobEntity):
     """Hostile mob entities that can attack."""
     
     def __cinit__(self, int entity_type, double x, double y, double z, int health):
-        # Call MobEntity.__cinit__ explicitly with proper args
-        MobEntity.__cinit__(self, entity_type, x, y, z, health, True)
+        # MobEntity.__cinit__ will be called automatically
+        pass
+        
+    def __init__(self, int entity_type, double x, double y, double z, int health):
+        # Initialize via MobEntity parent
+        super().__init__(entity_type, x, y, z, health, True)
         self.attack_damage = 1.0
         self.attack_range = 2.0
         self.detection_range = 16.0
@@ -557,8 +580,12 @@ cdef class PassiveMobEntity(MobEntity):
     """Passive mob entities that can breed."""
     
     def __cinit__(self, int entity_type, double x, double y, double z, int health):
-        # Call MobEntity.__cinit__ explicitly with proper args
-        MobEntity.__cinit__(self, entity_type, x, y, z, health, False)
+        # MobEntity.__cinit__ will be called automatically
+        pass
+        
+    def __init__(self, int entity_type, double x, double y, double z, int health):
+        # Initialize via MobEntity parent
+        super().__init__(entity_type, x, y, z, health, False)
         self.breeding_cooldown = 6000  # 5 minutes at 20 TPS
         self.last_bred_time = 0
         self.is_baby = False
@@ -605,8 +632,19 @@ cdef class VehicleEntity(Entity):
     """Vehicle entities that can carry passengers."""
     
     def __cinit__(self, int entity_type, double x, double y, double z):
-        # Call Entity.__cinit__ explicitly with proper args
-        Entity.__cinit__(self, entity_type, x, y, z)
+        # Entity.__cinit__ will be called automatically
+        pass
+        
+    def __init__(self, int entity_type, double x, double y, double z):
+        # Initialize Entity fields specifically
+        self.entity_type = entity_type
+        self.x = x
+        self.y = y
+        self.z = z
+        self.chunk_x = <int32_t>(x / CHUNK_SIZE)
+        self.chunk_z = <int32_t>(z / CHUNK_SIZE)
+        
+        # Initialize VehicleEntity-specific fields
         self.passengers = []
         self.max_speed = 8.0
         self.acceleration = 0.1
@@ -648,8 +686,19 @@ cdef class FallingBlockEntity(Entity):
     """Falling block entities."""
     
     def __cinit__(self, uint8_t block_id, uint8_t data_value, double x, double y, double z):
-        # Call Entity.__cinit__ explicitly with proper args
-        Entity.__cinit__(self, EntityType.FALLING_BLOCK, x, y, z)
+        # Entity.__cinit__ will be called automatically
+        pass
+        
+    def __init__(self, uint8_t block_id, uint8_t data_value, double x, double y, double z):
+        # Initialize Entity fields specifically
+        self.entity_type = EntityType.FALLING_BLOCK
+        self.x = x
+        self.y = y
+        self.z = z
+        self.chunk_x = <int32_t>(x / CHUNK_SIZE)
+        self.chunk_z = <int32_t>(z / CHUNK_SIZE)
+        
+        # Initialize FallingBlockEntity-specific fields
         self.block_id = block_id
         self.data_value = data_value
         self.time_existed = 0
@@ -768,8 +817,19 @@ cdef class ItemEntity(Entity):
     """Represents an item in the world."""
         
     def __cinit__(self, int item_id, int count, double x, double y, double z):
-        # Call Entity.__cinit__ explicitly with proper args
-        Entity.__cinit__(self, EntityType.ITEM, x, y, z)
+        # Entity.__cinit__ will be called automatically
+        pass
+        
+    def __init__(self, int item_id, int count, double x, double y, double z):
+        # Initialize Entity fields specifically
+        self.entity_type = EntityType.ITEM
+        self.x = x
+        self.y = y
+        self.z = z
+        self.chunk_x = <int32_t>(x / CHUNK_SIZE)
+        self.chunk_z = <int32_t>(z / CHUNK_SIZE)
+        
+        # Initialize ItemEntity-specific fields
         self.item_id = item_id
         self.count = count
         self.metadata = {}
@@ -825,12 +885,23 @@ cdef class ProjectileEntity(Entity):
     """Base class for projectiles like arrows."""
         
     def __cinit__(self, int entity_type, Entity shooter, double x, double y, double z, double velocity_x, double velocity_y, double velocity_z):
-        # Call Entity.__cinit__ explicitly with proper args
-        Entity.__cinit__(self, entity_type, x, y, z)
-        self.shooter = shooter
+        # Entity.__cinit__ will be called automatically
+        pass
+        
+    def __init__(self, int entity_type, Entity shooter, double x, double y, double z, double velocity_x, double velocity_y, double velocity_z):
+        # Initialize Entity fields specifically
+        self.entity_type = entity_type
+        self.x = x
+        self.y = y
+        self.z = z
         self.velocity_x = velocity_x
         self.velocity_y = velocity_y
         self.velocity_z = velocity_z
+        self.chunk_x = <int32_t>(x / CHUNK_SIZE)
+        self.chunk_z = <int32_t>(z / CHUNK_SIZE)
+        
+        # Initialize ProjectileEntity-specific fields
+        self.shooter = shooter
         self.damage = 1.0
         self.creation_time = <uint64_t>time(NULL)
         self.max_age = 30  # 30 seconds max age
