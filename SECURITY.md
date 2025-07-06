@@ -18,7 +18,7 @@ We take the security of MCPy seriously. If you believe you've found a security v
 ### Preferred Method
 
 1. **Do not** disclose the vulnerability publicly.
-2. Email your findings to [security@example.com](mailto:sharmamagi0@gmail.com). If possible, encrypt your message using our PGP key (available below).
+2. Email your findings to [mail](mailto:sharmamagi0@gmail.com). If possible, encrypt your message using our PGP key (available below).
 3. Include detailed information about the vulnerability:
    - Type of vulnerability
    - Path or component affected
