@@ -1,4 +1,4 @@
-## Cython Compilation Errors in `https://github.com/magi8101/Mcpy/blob/main/mcpy/core/entity_system.pyx`
+## Cython Compilation Errors in `mcpy/core/entity_system.pyx`
 
 The following Cython compilation errors are currently being encountered while building the project. This issue is actively being worked on, and contributions from the community are welcome to help resolve these errors.
 
